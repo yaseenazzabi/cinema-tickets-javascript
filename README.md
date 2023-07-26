@@ -14,3 +14,8 @@ Changes to the template include the removal of the spread operator in `TicketSer
 Additonally, the boilerplate code for `InvalidPurchaseException.js` has been removed, but its implementation comes as expected.
 
 Finally, a global `constants.js` file has been added which is used throughout the solution. This resulted in a change to `TicketTypeRequest.js`, where constants are now used to reference valid fieldnames for ticket types.
+
+## Improvements
+Due to time constraints, the code has been put together quickly. The main thing I would improve given an hour or two extra is to refactor the exception handling. Currently, all exception handling occurs in `TicketService.purchaseTickets()`, when this method should really be wrapped in a try / catch block and have exceptions raised in the relevant validation functions. 
+
+The validation functions simply return boolean values which are handled by the `purchaseTickets()` method, which works fine, but it is not the most scalable approach.
