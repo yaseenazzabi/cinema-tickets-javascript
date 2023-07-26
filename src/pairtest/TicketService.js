@@ -74,11 +74,11 @@ export default class TicketService {
 
     purchaseTickets(accountId, ticketTypeRequests) {
         if(!this.validateAccountId(accountId)) {
-            throw (new InvalidPurchaseException(400, 'Account ID is invalid', [0]))
+            throw (new InvalidPurchaseException(400, 'Account ID is invalid', [accountId]))
         }
 
         if(!this.validateTicketTypeRequests(ticketTypeRequests)) {
-            throw (new InvalidPurchaseException(400, 'ticketTypeRequests received are invalid'))
+            throw (new InvalidPurchaseException(400, 'ticketTypeRequests received are invalid', [ticketTypeRequests]))
         }
 
         const ticketData = {
@@ -94,7 +94,7 @@ export default class TicketService {
         }
         
         if(!this.validateChildrenAndInfants(ticketData)) {
-            throw (new InvalidPurchaseException(400, 'Cannot purchase child / infant tickets without an accompanying adult'))
+            throw (new InvalidPurchaseException(400, 'Cannot purchase child / infant tickets without an accompanying adult', [ticketData]))
         }
 
         const ticketsToBuy = this.computeTicketsToBuy(ticketData)
