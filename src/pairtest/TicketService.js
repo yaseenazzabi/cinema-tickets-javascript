@@ -40,6 +40,19 @@ export default class TicketService {
     validateTicketCount(ticketsToBuy) {
         return ticketsToBuy <= this.MAX_TICKETS
     }
+
+    validateChildrenAndInfants(ticketData) {
+        const { 
+            [constants.ADULT_TICKET_FIELDNAME]: adults, 
+            [constants.CHILD_TICKET_FIELDNAME]: children, 
+            [constants.INFANT_TICKET_FIELDNAME]: infants 
+        } = ticketData
+
+        if(((children > 0) || (infants > 0)) && adults === 0) {
+            return false
+        }
+        return true
+    }
     
     computeTicketsToBuy(ticketData) {
         const { 
@@ -80,6 +93,10 @@ export default class TicketService {
             ticketData[type] = ticketData[type] + ttr.getNoOfTickets()
         }
         
+        if(!this.validateChildrenAndInfants(ticketData)) {
+            throw (new InvalidPurchaseException(400, 'Cannot purchase child / infant tickets without an accompanying adult'))
+        }
+
         const ticketsToBuy = this.computeTicketsToBuy(ticketData)
         if(!this.validateTicketCount(ticketsToBuy)) {
             throw (new InvalidPurchaseException(400, 'Too many tickets purchased (maximum of 20 per transaction)', [ticketData]))

@@ -80,6 +80,43 @@ describe('TicketService tests', () => {
         })
     })
 
+    describe('validateChildrenAndInfants tests', () => {
+
+        afterEach(() => {
+            jest.resetModules()
+        })
+
+        test('should accept child and infant tickets with adults', () => {
+            const ts = new TicketService()
+            const ticketData = {
+                [constants.ADULT_TICKET_FIELDNAME]: 1,
+                [constants.CHILD_TICKET_FIELDNAME]: 1,
+                [constants.INFANT_TICKET_FIELDNAME]: 1
+            }
+            expect(ts.validateChildrenAndInfants(ticketData)).toBe(true)
+        })
+
+        test('should reject child tickets with no adults', () => {
+            const ts = new TicketService()
+            const ticketData = {
+                [constants.ADULT_TICKET_FIELDNAME]: 0,
+                [constants.CHILD_TICKET_FIELDNAME]: 1,
+                [constants.INFANT_TICKET_FIELDNAME]: 0
+            }
+            expect(ts.validateChildrenAndInfants(ticketData)).toBe(false)
+        })
+
+        test('should reject infant tickets with no adults', () => {
+            const ts = new TicketService()
+            const ticketData = {
+                [constants.ADULT_TICKET_FIELDNAME]: 0,
+                [constants.CHILD_TICKET_FIELDNAME]: 0,
+                [constants.INFANT_TICKET_FIELDNAME]: 1
+            }
+            expect(ts.validateChildrenAndInfants(ticketData)).toBe(false)
+        })
+    })
+
     describe('computeTicketsToBuy tests', () => {
 
         afterEach(() => {
@@ -199,6 +236,32 @@ describe('TicketService tests', () => {
             catch (e) {
                 expect(e instanceof InvalidPurchaseException).toBe(true)
                 expect(e.message).toBe('ticketTypeRequests received are invalid')
+            }
+        })
+
+        test('should decline requests that has children but no adults', () => {
+            try {
+                const ts = new TicketService()
+                const ttr1 = new TicketTypeRequest(constants.CHILD_TICKET_FIELDNAME, 5)
+                const res = ts.purchaseTickets(1, [ttr1])
+                throw({code: 500, message: 'Unit test failed to catch the error'})
+            }
+            catch (e) {
+                expect(e instanceof InvalidPurchaseException).toBe(true)
+                expect(e.message).toBe('Cannot purchase child / infant tickets without an accompanying adult')
+            }
+        })
+
+        test('should decline requests that has infants but no adults', () => {
+            try {
+                const ts = new TicketService()
+                const ttr1 = new TicketTypeRequest(constants.INFANT_TICKET_FIELDNAME, 5) 
+                const res = ts.purchaseTickets(1, [ttr1])
+                throw({code: 500, message: 'Unit test failed to catch the error'})
+            }
+            catch (e) {
+                expect(e instanceof InvalidPurchaseException).toBe(true)
+                expect(e.message).toBe('Cannot purchase child / infant tickets without an accompanying adult')
             }
         })
 
