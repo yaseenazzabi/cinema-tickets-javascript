@@ -1,4 +1,4 @@
-function InvalidPurchaseException(code, message, stack) {
+function InvalidPurchaseException(code, message, stack = []) {
     this.code = code
     this.message = message
     this.stack = stack
